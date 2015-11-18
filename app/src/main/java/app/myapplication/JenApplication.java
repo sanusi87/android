@@ -1,6 +1,7 @@
 package app.myapplication;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -13,6 +14,19 @@ public class JenApplication extends Activity{
         setContentView(R.layout.activity_application);
 
         setupApplicationList();
+
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if( extras != null ){
+            String company = extras.getString("company");
+            int emp_profile_id = extras.getInt("emp_profile_id");
+            int application_id = extras.getInt("application_id");
+            int post_id = extras.getInt("post_id");
+
+
+        }else{
+
+        }
     }
 
     private void setupApplicationList(){

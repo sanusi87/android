@@ -1,5 +1,6 @@
 package app.myapplication;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -21,6 +22,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // start service to check new application
         Log.e("test", "starting service...");
         Intent intent = new Intent();
         intent.putExtra("test", "test2");
@@ -45,7 +47,7 @@ public class MainActivity extends ActionBarActivity {
         testNotificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                applicationAlert();
             }
         });
     }
@@ -72,6 +74,16 @@ public class MainActivity extends ActionBarActivity {
     public void onPause() {
         super.onPause();  // Always call the superclass method first
 
+        Log.e("test", "app paused, begin synchronisation...");
+        // start service to synchronize
+
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        Log.e("test", "app stopped...");
+        // start service to synchronize
     }
 
 
@@ -87,24 +99,25 @@ public class MainActivity extends ActionBarActivity {
             s = "COMPANY has rejected your application.";
         }
 
-        Bundle b = null;
+        Bundle b = new Bundle();
         b.putString("company", "COMPANY"); // company
-        b.putInt("employer_id", 0); // company id
+        b.putInt("emp_profile_id", 0); // company id
         b.putInt("application_id", 0); // application id
         b.putInt("post_id", 0); // job post id
 
         Intent intent = new Intent(this, JenApplication.class);
         PendingIntent pIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
 
-        NotificationCompat.Builder n = new NotificationCompat.Builder(getApplicationContext());
-        //n.addAction();
-        n.setContentTitle(getResources().getString(R.string.application_responded_title));
-        n.setContentText(s);
-        n.setSmallIcon(R.drawable.icon);
-        n.setExtras(b);
-        n.build();
+        Notification n = new NotificationCompat.Builder(this)
+        .setContentTitle(getResources().getString(R.string.application_responded_title))
+        .setContentText(s)
+        .setSmallIcon(R.drawable.icon)
+        .setExtras(b)
+        .setContentIntent(pIntent)
+        .setAutoCancel(true)
+        .build();
 
         NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        nm.notify();
+        nm.notify(0,n);
     }
 }
