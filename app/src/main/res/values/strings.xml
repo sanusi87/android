@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">My Application</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="application_responded_title">Application responded</string>
+    <string name="application">Applications</string>
+    <string name="no_application">No application found.</string>
+    <string name="test_notification">Test Notification</string>
+</resources>
