@@ -7,11 +7,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class JenJobTable extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "_pouch_job";
-    public static final String TABLE_NAME = "[by-sequence]";
+    public static final String TABLE_NAME = "by-sequence";
+    public static final String TABLE_NAME2 = "[by-sequence]";
 
     private static String SQL_CREATE_ENTRIES = "CREATE TABLE '"+JenJobTable.TABLE_NAME
             +"' (seq INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, json, deleted TINYINT(1), doc_id, rev);";
-    private static String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "+JenJobTable.TABLE_NAME;
+    private static String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS '"+JenJobTable.TABLE_NAME+"'";
 
     public JenJobTable(Context context) {
         super(context, DATABASE_NAME , null, 1);
@@ -44,6 +45,7 @@ public class JenJobTable extends SQLiteOpenHelper {
                 c.moveToNext();
                 i++;
             }
+            c.close();
         }else{
             arr = new String[0];
         }

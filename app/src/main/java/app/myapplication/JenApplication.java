@@ -3,6 +3,7 @@ package app.myapplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,6 +30,14 @@ public class JenApplication extends Activity{
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        //JenService.NETWORK_STATUS = isNetworkAvailable();
+        Log.e("test", "network status=" + JenService.NETWORK_STATUS);
+    }
+
     private void setupApplicationList(){
         ListView applications = (ListView)findViewById(R.id.applicationList);
         JenApplicationAdapter jaa = new JenApplicationAdapter(getApplicationContext());
@@ -52,4 +61,6 @@ public class JenApplication extends Activity{
         //Log.e("test", "visibility? "+String.valueOf(noApplication.getVisibility()));
 
     }
+
+
 }

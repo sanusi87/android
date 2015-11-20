@@ -17,10 +17,22 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".JenApplication"></activity>
+        <activity
+            android:name=".JenApplication"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
 
         <service
-            android:name=".MyService"
+            android:name=".JenService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+
+        <service
+            android:name=".LocalService"
             android:enabled="true"
             android:exported="true" >
         </service>

@@ -38,4 +38,12 @@
         android:layout_below="@+id/getApplication"
         android:layout_centerHorizontal="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/test_bound"
+        android:id="@+id/testBound"
+        android:layout_below="@+id/testNotification"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

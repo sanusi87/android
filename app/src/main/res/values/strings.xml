@@ -7,4 +7,5 @@
     <string name="application">Applications</string>
     <string name="no_application">No application found.</string>
     <string name="test_notification">Test Notification</string>
+    <string name="test_bound">Test Bound</string>
 </resources>

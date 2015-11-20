@@ -7,6 +7,8 @@ import android.util.Log;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -21,9 +23,30 @@ import java.io.InputStream;
 
 public class JenHttpRequest {
 
-    public JenHttpRequest(String url, Intent intent){
-        String response = sendRequest(url, intent);
-        Log.e("test", response);
+    /**
+     * type 1 = GET
+     * type 2 = POST
+     * type 3 = DELETE
+     * */
+
+    public static final int GET_REQUEST = 1;
+    public static final int POST_REQUEST = 2;
+    public static final int DELETE_REQUEST = 3;
+
+    public JSONObject response;
+
+    public JenHttpRequest(int type, String url, Intent intent){
+        if( type == JenHttpRequest.GET_REQUEST ){
+            response = sendGetRequest(url);
+        }else if( type == JenHttpRequest.POST_REQUEST ){
+            response = sendPostRequest(url, intent);
+        }else if( type == JenHttpRequest.DELETE_REQUEST ){
+            response = sendDeleteRequest(url);
+        }else{
+            response = null;
+        }
+
+        Log.e("test", response.toString());
     }
 
     public String createJson( Bundle extras ){
@@ -39,7 +62,18 @@ public class JenHttpRequest {
         return obj.toString();
     }
 
-    public String sendRequest(String url, Intent intent){
+    public JSONObject decodeJsonString(String json){
+        try {
+            JSONObject jo = new JSONObject(json);
+            return jo;
+        } catch (JSONException e) {
+
+        }
+        return null;
+    }
+
+    // send POST request
+    public JSONObject sendPostRequest(String url, Intent intent){
         Bundle extras = intent.getExtras();
 
         try {
@@ -55,15 +89,56 @@ public class JenHttpRequest {
             HttpPost httppost = new HttpPost(url);
             httppost.addHeader("Content-Type", "application/json");
             httppost.addHeader("Accept", "application/json");
-
             httppost.setEntity(entity);
-
             HttpResponse response = httpclient.execute(httppost);
             HttpEntity _entity = response.getEntity();
-
             InputStream is = _entity.getContent();
 
-            return readInputStreamAsString(is);
+            return decodeJsonString(readInputStreamAsString(is));
+        }catch (Exception e){
+            Log.e("test", e.getMessage());
+        }
+        return null;
+    }
+
+
+    // send GET request
+    public JSONObject sendGetRequest(String url){
+        try {
+            Log.e("test", "trying...");
+
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpGet httpget = new HttpGet(url);
+            httpget.addHeader("Content-Type", "application/json");
+            httpget.addHeader("Accept", "application/json");
+
+            HttpResponse response = httpclient.execute(httpget);
+            HttpEntity _entity = response.getEntity();
+            InputStream is = _entity.getContent();
+
+            return decodeJsonString(readInputStreamAsString(is));
+        }catch (Exception e){
+            Log.e("test", e.getMessage());
+        }
+        return null;
+    }
+
+
+    // send DELETE request
+    public JSONObject sendDeleteRequest(String url){
+        try {
+            Log.e("test", "trying...");
+
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpDelete httpdelete = new HttpDelete(url);
+            httpdelete.addHeader("Content-Type", "application/json");
+            httpdelete.addHeader("Accept", "application/json");
+
+            HttpResponse response = httpclient.execute(httpdelete);
+            HttpEntity _entity = response.getEntity();
+            InputStream is = _entity.getContent();
+
+            return decodeJsonString(readInputStreamAsString(is));
         }catch (Exception e){
             Log.e("test", e.getMessage());
         }
@@ -80,6 +155,9 @@ public class JenHttpRequest {
             buf.write(b);
             result = bis.read();
         }
+        Log.e("response", buf.toString());
         return buf.toString();
     }
+
+
 }
