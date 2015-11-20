@@ -83,6 +83,14 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
+        Button testSync = (Button)findViewById(R.id.testSync);
+        testSync.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                JenSettingsTable.startSynchronisation();
+            }
+        });
+
         setupTable();
     }
 
@@ -91,6 +99,7 @@ public class MainActivity extends ActionBarActivity {
         new JenApplicationTable(getApplicationContext()).addApplication();
         new JenSettingsTable(getApplicationContext()).addSettings();
         new JenTokenTable(getApplicationContext()).addNewToken();
+        new JenEducationTable(getApplicationContext()).addEducation();
     }
 
 

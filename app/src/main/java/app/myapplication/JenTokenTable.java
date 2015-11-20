@@ -10,6 +10,8 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.jar.JarOutputStream;
+
 public class JenTokenTable extends SQLiteOpenHelper{
 
     public static final String DATABASE_NAME = "_pouch_token";
@@ -21,9 +23,12 @@ public class JenTokenTable extends SQLiteOpenHelper{
     private static String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS '"+JenTokenTable.TABLE_NAME+"'";
 
     private static SQLiteDatabase db;
+    private static Context context;
 
     public JenTokenTable(Context context) {
         super(context, DATABASE_NAME, null, 1);
+        this.context = context;
+        db = getReadableDatabase();
     }
 
     @Override
@@ -37,33 +42,39 @@ public class JenTokenTable extends SQLiteOpenHelper{
         onCreate(db2);
     }
 
-    public String[] getToken(){
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM [by-sequence] WHERE seq IN ("
-                +"SELECT MAX(seq) FROM [by-sequence] WHERE deleted=0 AND doc_id NOT IN("
-                +"SELECT doc_id FROM [by-sequence] WHERE deleted=1) GROUP BY doc_id)", null);
-
-        String[] arr;
+    public String getToken(){
+        Cursor c = db.rawQuery("SELECT * FROM [by-sequence] WHERE seq IN (SELECT MAX(seq) FROM [by-sequence] WHERE deleted=0)", null);
+        //String[] arr;
         if( c != null ){
-            arr = new String[c.getCount()];
+            //arr = new String[c.getCount()];
             int i=0;
+            String token = null;
             c.moveToFirst();
             while( !c.isAfterLast() ){
+                Log.e("index", "" + c.getString(0));
                 Log.e("test", "profile["+i+"]=" + c.getString(1));
-                arr[i] = c.getString(1);
+                //arr[i] = c.getString(1);
+                token = c.getString(1);
                 c.moveToNext();
                 i++;
             }
             c.close();
-        }else{
-            arr = new String[0];
+
+            if( token != null ){
+                try {
+                    JSONObject jo = new JSONObject(token);
+                    return jo.getString("access_token");
+                } catch (JSONException e) {
+                    Log.e("jsonExp", e.getLocalizedMessage());
+                }
+            }
         }
-        return arr;
+        return null;
     }
 
 
     public void addNewToken(){
-        SQLiteDatabase db = this.getReadableDatabase();
+        //SQLiteDatabase db = getReadableDatabase();
         ContentValues cv = new ContentValues();
 
         JSONObject jo = new JSONObject();
@@ -89,9 +100,12 @@ public class JenTokenTable extends SQLiteOpenHelper{
 
         cv.put("json", jo.toString());
         cv.put("deleted", "0");
-        cv.put("doc_id", "8250A1E8-AB9A-56E1-A649-7030462F8127");
+        cv.put("doc_id", "123");
         cv.put("rev", "1-6f741f3d7727c76bbd38cd453a9e6398");
 
+        db.insert(JenTokenTable.TABLE_NAME2, null, cv);
+
+        cv.put("doc_id", "456");
         db.insert(JenTokenTable.TABLE_NAME2, null, cv);
     }
 }

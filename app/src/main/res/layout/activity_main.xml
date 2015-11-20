@@ -46,4 +46,12 @@
         android:layout_below="@+id/testNotification"
         android:layout_centerHorizontal="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/test_sync"
+        android:id="@+id/testSync"
+        android:layout_below="@+id/testBound"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

@@ -116,7 +116,7 @@ public class JenApplicationTable extends SQLiteOpenHelper {
     public static void startSynchronisation(String token) {
         // download applications
         JenHttpRequest jenReq = new JenHttpRequest(JenHttpRequest.GET_REQUEST, "http://api.jenjobs.com/jobseeker/application?access-token="+token, null);
-        //Log.e("response", jenReq.response);
+        Log.e("response", jenReq.response.toString());
 
         if( jenReq.response != null ){
 

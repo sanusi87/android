@@ -14,13 +14,17 @@ import java.util.Set;
 public class NetworkBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "NetworkStateReceiver";
 
+    private static boolean running = false;
+
     @Override
     public void onReceive(final Context context, final Intent intent) {
         Log.e(TAG, "Network connectivity change");
+        if( !NetworkBroadcastReceiver.running ){
+            NetworkBroadcastReceiver.running = true;
 
-        Bundle extras = intent.getExtras();
+            Bundle extras = intent.getExtras();
 
-        if (extras != null) {
+            if (extras != null) {
 
             /*
             for(String key: extras.keySet()){
@@ -29,11 +33,11 @@ public class NetworkBroadcastReceiver extends BroadcastReceiver {
             }
             */
 
-            final ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            final NetworkInfo ni = connectivityManager.getActiveNetworkInfo();
+                final ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                final NetworkInfo ni = connectivityManager.getActiveNetworkInfo();
 
-            if (ni != null && ni.isConnected()) {
-                Log.e(TAG, "Network " + ni.getTypeName() + " connected");
+                if (ni != null && ni.isConnected()) {
+                    Log.e(TAG, "Network " + ni.getTypeName() + " connected");
 
 
                 /*
@@ -59,21 +63,23 @@ public class NetworkBroadcastReceiver extends BroadcastReceiver {
                 *
                 * */
 
-                 // get token first
-                //JenTokenTable token = new JenTokenTable(context);
-                //String[] tokenList = token.getToken();
+                    // get token first
+                    //JenTokenTable token = new JenTokenTable(context);
+                    //String[] tokenList = token.getToken();
 
-                // update network status status
-                JenService.NETWORK_STATUS = true;
+                    // update network status status
+                    JenService.NETWORK_STATUS = true;
 
-                JenSettingsTable.startSynchronisation();
+                    JenSettingsTable.startSynchronisation();
 
-            } else if (intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, Boolean.FALSE)) {
-                Log.e(TAG, "There's no network connectivity");
-                JenService.NETWORK_STATUS = false;
+                } else if (intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, Boolean.FALSE)) {
+                    Log.e(TAG, "There's no network connectivity");
+                    JenService.NETWORK_STATUS = false;
+                }
+            }else{
+                //Log.e("test", "no intent");
             }
-        }else{
-            //Log.e("test", "no intent");
+            NetworkBroadcastReceiver.running = false;
         }
 
     }

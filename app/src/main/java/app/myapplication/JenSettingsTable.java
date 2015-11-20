@@ -41,13 +41,14 @@ public class JenSettingsTable extends SQLiteOpenHelper{
 
     public JenSettingsTable(Context context) {
         super(context, DATABASE_NAME, null, 1);
-        Log.e("create", SQL_CREATE_ENTRIES);
+        //Log.e("create", SQL_CREATE_ENTRIES);
+        JenSettingsTable.context = context;
         db = this.getReadableDatabase();
     }
 
     @Override
     public void onCreate(SQLiteDatabase db2) {
-        Log.e("on_create", SQL_CREATE_ENTRIES);
+        //Log.e("on_create", SQL_CREATE_ENTRIES);
         db2.execSQL(SQL_CREATE_ENTRIES);
     }
 
@@ -114,7 +115,7 @@ public class JenSettingsTable extends SQLiteOpenHelper{
             }
             c.close();
 
-            Log.e("test", "str="+str);
+            //Log.e("test", "str="+str);
 
             try {
                 JSONObject jo = new JSONObject(str);
@@ -127,61 +128,64 @@ public class JenSettingsTable extends SQLiteOpenHelper{
                     String value = jo.getString(key);
                     Boolean _value = jo.getBoolean(key);
                     Log.e("test", "key="+key+",value="+value);
-                    Log.e("test", "boolean="+jo.getBoolean(key) );
+                    //Log.e("test", "boolean="+jo.getBoolean(key) );
 
                     // if require sync is TRUE, then we add into the array
                     if( _value ){
                         arr.add(new BasicNameValuePair(key, value));
-                        Log.e("test", "isBool=true");
+                        //Log.e("test", "isBool=true");
                     }else{
-                        Log.e("test", "isBool=false");
+                        //Log.e("test", "isBool=false");
                     }
                 }
                 return arr;
             } catch (JSONException e) {
-                Log.e("test", e.getMessage());
+                //Log.e("test", e.getMessage());
             }
         }else{
-            Log.e("test", "c=null");
+            //Log.e("test", "c=null");
         }
         return null;
     }
 
     public static boolean startSynchronisation(){
-        Log.e("test", "sync started");
+        //Log.e("test", "sync started");
         ArrayList<BasicNameValuePair> arr = JenSettingsTable.checkSyncRequired();
-        Log.e("test", "arr="+arr);
+        //Log.e("test", "arr="+arr);
         if( arr != null ){
             // get saved access token
             JenTokenTable jtt = new JenTokenTable(context);
-            String[] token = jtt.getToken();
+            String accessToken = jtt.getToken();
+            Log.e("token", accessToken);
 
-            if( token != null ){
-                String accessToken = token[0];
-
+            if( accessToken != null ){
                 for( BasicNameValuePair value:arr ){
-                    if( value.getName() == "workExp" ){
+                    Log.e("arr", "value="+value.getValue()+",key="+value.getName());
+
+                    if( "workExp".equals(value.getName()) ){
                         //JenWorkTable.startSynchronisation(accessToken);
-                    }else if( value.getName() == "education" ){
-                        //JenEducationTable.startSynchronisation(accessToken);
-                    }else if( value.getName() == "profile" ){
+                    }else if( "education".equals(value.getName()) ){
+                        JenEducationTable.startSynchronisation(accessToken);
+                    }else if( "profile".equals(value.getName()) ){
                         //JenProfileTable.startSynchronisation(accessToken);
-                    }else if( value.getName() == "jobseek" ){
+                    }else if( "jobseek".equals(value.getName()) ){
 
-                    }else if( value.getName() == "jobPref" ){
+                    }else if( "jobPref".equals(value.getName()) ){
 
-                    }else if( value.getName() == "attachment" ){
+                    }else if( "attachment".equals(value.getName()) ){
 
-                    }else if( value.getName() == "language" ){
+                    }else if( "language".equals(value.getName()) ){
                         //JenLanguageTable.startSynchronisation(accessToken);
-                    }else if( value.getName() == "skill" ){
+                    }else if( "skill".equals(value.getName()) ){
                         //JenSkillTable.startSynchronisation(accessToken);
-                    }else if( value.getName() == "additionalinfo" ){
+                    }else if( "additionalinfo".equals(value.getName()) ){
 
-                    }else if( value.getName() == "application" ){
+                    }else if( "application".equals(value.getName()) ){
                         JenApplicationTable.startSynchronisation(accessToken);
-                    }else if( value.getName() == "bookmark" ){
+                    }else if( "bookmark".equals(value.getName()) ){
                         //JenBookmarkTable.startSynchronisation(accessToken);
+                    }else{
+                        Log.e("test", "condition failed!");
                     }
                 }
             }else{

@@ -33,20 +33,16 @@ public class JenHttpRequest {
     public static final int POST_REQUEST = 2;
     public static final int DELETE_REQUEST = 3;
 
-    public JSONObject response;
+    public JSONObject response = null;
 
     public JenHttpRequest(int type, String url, Intent intent){
         if( type == JenHttpRequest.GET_REQUEST ){
-            response = sendGetRequest(url);
+            sendGetRequest(url);
         }else if( type == JenHttpRequest.POST_REQUEST ){
             response = sendPostRequest(url, intent);
         }else if( type == JenHttpRequest.DELETE_REQUEST ){
             response = sendDeleteRequest(url);
-        }else{
-            response = null;
         }
-
-        Log.e("test", response.toString());
     }
 
     public String createJson( Bundle extras ){
@@ -63,11 +59,12 @@ public class JenHttpRequest {
     }
 
     public JSONObject decodeJsonString(String json){
+        Log.e("jsonResp", json);
         try {
             JSONObject jo = new JSONObject(json);
             return jo;
         } catch (JSONException e) {
-
+            Log.e("decodeExp", e.getLocalizedMessage());
         }
         return null;
     }
@@ -79,7 +76,7 @@ public class JenHttpRequest {
         try {
             String obj = createJson(extras);
 
-            Log.e("test", "trying...");
+            Log.e("post", "trying...");
             Log.e("test", "length: "+obj.toString().length());
             StringEntity entity = new StringEntity(obj.toString());
             entity.setContentEncoding(HTTP.UTF_8);
@@ -103,23 +100,29 @@ public class JenHttpRequest {
 
 
     // send GET request
-    public JSONObject sendGetRequest(String url){
-        try {
-            Log.e("test", "trying...");
+    public JSONObject sendGetRequest(final String url){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpGet httpget = new HttpGet(url);
+                httpget.addHeader("Content-Type", "application/json");
+                httpget.addHeader("Accept", "application/json");
 
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpGet httpget = new HttpGet(url);
-            httpget.addHeader("Content-Type", "application/json");
-            httpget.addHeader("Accept", "application/json");
+                try {
+                    Log.e("get", "trying...");
+                    HttpResponse _response = httpclient.execute(httpget);
+                    HttpEntity _entity = _response.getEntity();
+                    InputStream is = _entity.getContent();
+                    Log.e("inputStream", is.toString());
 
-            HttpResponse response = httpclient.execute(httpget);
-            HttpEntity _entity = response.getEntity();
-            InputStream is = _entity.getContent();
+                    response = decodeJsonString(readInputStreamAsString(is));
+                }catch (IOException e) {
+                    Log.e("sendGet", "IOExcp=" + e.getMessage());
+                }
+            }
+        }).start();
 
-            return decodeJsonString(readInputStreamAsString(is));
-        }catch (Exception e){
-            Log.e("test", e.getMessage());
-        }
         return null;
     }
 
@@ -127,7 +130,7 @@ public class JenHttpRequest {
     // send DELETE request
     public JSONObject sendDeleteRequest(String url){
         try {
-            Log.e("test", "trying...");
+            Log.e("delete", "trying...");
 
             HttpClient httpclient = new DefaultHttpClient();
             HttpDelete httpdelete = new HttpDelete(url);
